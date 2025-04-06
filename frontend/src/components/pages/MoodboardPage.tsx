@@ -155,120 +155,123 @@ const ErrorMessage = styled.div`
   font-size: 16px;
 `;
 
+const API_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+
+
 const MoodboardPage: React.FC = () => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [results, setResults] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [results, setResults] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      setResults(null);
-      setError(null);
-    }
-  };
+    const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setSelectedImage(file);
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+            setResults(null);
+            setError(null);
+        }
+    };
 
-  const handleUploadClick = () => {
-    const input = document.getElementById('image-upload') as HTMLInputElement;
-    if (input) {
-      input.click();
-    }
-  };
+    const handleUploadClick = () => {
+        const input = document.getElementById('image-upload') as HTMLInputElement;
+        if (input) {
+            input.click();
+        }
+    };
 
-  const handleAnalyze = async () => {
-    if (!selectedImage) return;
+    const handleAnalyze = async () => {
+        if (!selectedImage) return;
 
-    setLoading(true);
-    setError(null);
+        setLoading(true);
+        setError(null);
 
-    const formData = new FormData();
-    formData.append('image', selectedImage);
+        const formData = new FormData();
+        formData.append('image', selectedImage);
 
-    try {
-      const response = await fetch('http://localhost:8000/api/analyze-moodboard', {
-        method: 'POST',
-        body: formData,
-      });
+        try {
+            const response = await fetch(`${API_URL}/api/analyze-moodboard`, {
+                method: 'POST',
+                body: formData,
+            });
 
-      const data = await response.json();
+            const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to analyze image');
-      }
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to analyze image');
+            }
 
-      setResults(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to analyze image. Please try again.');
-      console.error('Error analyzing image:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+            setResults(data);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to analyze image. Please try again.');
+            console.error('Error analyzing image:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  return (
-    <PageContainer>
-      <BackButton />
-      <Title>🎨 Room Analyzer</Title>
-      
-      <UploadContainer>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          style={{ display: 'none' }}
-          id="image-upload"
-        />
-        <UploadButton onClick={handleUploadClick}>
-          Upload Room Image
-        </UploadButton>
-        {previewUrl && (
-          <>
-            <ImagePreview src={previewUrl} alt="Preview" />
-            <UploadButton onClick={handleAnalyze} disabled={loading}>
-              {loading ? 'Analyzing...' : 'Analyze Room'}
-            </UploadButton>
-          </>
-        )}
-      </UploadContainer>
+    return (
+        <PageContainer>
+            <BackButton />
+            <Title>🎨 Room Analyzer</Title>
 
-      {loading && <LoadingSpinner />}
-
-      {error && (
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
-      )}
-
-      {results && (
-        <ResultsContainer>
-          <VibeDescription>
-            <h2>Room Vibe</h2>
-            <p>{results.vibe}</p>
-          </VibeDescription>
-
-          <SectionTitle>Recommended Furniture</SectionTitle>
-          <RecommendationsList>
-            {results.recommendations.map((item: any, index: number) => (
-              <RecommendationCard key={index}>
-                <h3>{item.name}</h3>
-                <p>{item.description}</p>
-                {item.link && (
-                  <RecommendationLink href={item.link} target="_blank" rel="noopener noreferrer">
-                    View Product
-                  </RecommendationLink>
+            <UploadContainer>
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    style={{ display: 'none' }}
+                    id="image-upload"
+                />
+                <UploadButton onClick={handleUploadClick}>
+                    Upload Room Image
+                </UploadButton>
+                {previewUrl && (
+                    <>
+                        <ImagePreview src={previewUrl} alt="Preview" />
+                        <UploadButton onClick={handleAnalyze} disabled={loading}>
+                            {loading ? 'Analyzing...' : 'Analyze Room'}
+                        </UploadButton>
+                    </>
                 )}
-              </RecommendationCard>
-            ))}
-          </RecommendationsList>
-        </ResultsContainer>
-      )}
-    </PageContainer>
-  );
+            </UploadContainer>
+
+            {loading && <LoadingSpinner />}
+
+            {error && (
+                <ErrorMessage>
+                    {error}
+                </ErrorMessage>
+            )}
+
+            {results && (
+                <ResultsContainer>
+                    <VibeDescription>
+                        <h2>Room Vibe</h2>
+                        <p>{results.vibe}</p>
+                    </VibeDescription>
+
+                    <SectionTitle>Recommended Furniture</SectionTitle>
+                    <RecommendationsList>
+                        {results.recommendations.map((item: any, index: number) => (
+                            <RecommendationCard key={index}>
+                                <h3>{item.name}</h3>
+                                <p>{item.description}</p>
+                                {item.link && (
+                                    <RecommendationLink href={item.link} target="_blank" rel="noopener noreferrer">
+                                        View Product
+                                    </RecommendationLink>
+                                )}
+                            </RecommendationCard>
+                        ))}
+                    </RecommendationsList>
+                </ResultsContainer>
+            )}
+        </PageContainer>
+    );
 };
 
 export default MoodboardPage; 

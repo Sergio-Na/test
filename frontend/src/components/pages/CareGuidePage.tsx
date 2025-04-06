@@ -103,6 +103,7 @@ interface CareGuide {
   cleaningTips: string;
   maintenanceSchedule: string;
 }
+const API_URL = process.env.BACKEND_URL || 'http://localhost:8000';
 
 const CareGuidePage: React.FC = () => {
   const [image, setImage] = useState<string | null>(null);
@@ -131,7 +132,7 @@ const CareGuidePage: React.FC = () => {
         
         try {
           // Send to backend for processing
-          const response = await fetch('http://localhost:8000/api/analyze-furniture', {
+          const response = await fetch(`${API_URL}/api/analyze-furniture`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

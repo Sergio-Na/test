@@ -147,6 +147,7 @@ const FurnitureDescription = styled.div`
   color: #999;
   margin-top: 5px;
 `;
+const API_URL = process.env.BACKEND_URL || 'http://localhost:8000';
 
 const PlanRoomPage: React.FC = () => {
   const [roomWidth, setRoomWidth] = useState<number>(400);
@@ -173,7 +174,7 @@ const PlanRoomPage: React.FC = () => {
 
   useEffect(() => {
     // Fetch categories when component mounts
-    fetch('http://localhost:8000/api/furniture-categories')
+    fetch(`${API_URL}/api/furniture-categories`)
       .then(response => response.json())
       .then(data => {
         if (data.categories) {
@@ -186,7 +187,7 @@ const PlanRoomPage: React.FC = () => {
   useEffect(() => {
     // Fetch furniture items when category changes
     if (selectedCategory) {
-      fetch(`http://localhost:8000/api/furniture-items/${encodeURIComponent(selectedCategory)}`)
+      fetch(`${API_URL}/api/furniture-items/${encodeURIComponent(selectedCategory)}`)
         .then(response => response.json())
         .then(data => {
           if (data.items) {

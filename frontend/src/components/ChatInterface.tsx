@@ -242,6 +242,8 @@ const formatMessage = (content: string) => {
   
   return content;
 };
+const API_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+
 
 const ChatInterface: React.FC = () => {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -373,7 +375,7 @@ const ChatInterface: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/chat', {
+      const response = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
